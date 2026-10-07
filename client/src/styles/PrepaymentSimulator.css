@@ -1,0 +1,92 @@
+/* client/src/styles/PrepaymentSimulator.css */
+.prepayment-card {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 18px;
+  margin-bottom: 24px;
+}
+
+.prepayment-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.prepayment-subtitle {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 14px;
+}
+
+.prepayment-form-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.prepayment-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.prepayment-input {
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #0f172a;
+  background-color: #ffffff;
+  outline: none;
+  width: 180px;
+}
+
+.prepayment-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px #2563eb;
+}
+
+.prepayment-results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.prepayment-result-box {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.prepayment-box-success {
+  background-color: #ecfdf5;
+  border-color: #a7f3d0;
+}
+
+.prepayment-result-key {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.prepayment-result-val {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.prepayment-result-val-highlight {
+  font-size: 16px;
+  font-weight: 700;
+  color: #059669;
+}

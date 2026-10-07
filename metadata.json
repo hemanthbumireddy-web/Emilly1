@@ -1,0 +1,6 @@
+{
+  "name": "Loan Comparison Platform",
+  "description": "Full stack loan comparison platform to compare loans by interest rate, tenure, fees, and estimated EMI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

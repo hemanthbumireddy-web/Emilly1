@@ -1,0 +1,109 @@
+/* client/src/styles/Saved.css */
+.saved-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.saved-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.saved-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 12px;
+}
+
+.saved-meta-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 14px;
+  color: #475569;
+  flex-wrap: wrap;
+}
+
+.saved-count-pill {
+  background-color: #eff6ff;
+  color: #2563eb;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.saved-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-open-comparison {
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.btn-open-comparison:hover {
+  background-color: #1d4ed8;
+}
+
+.btn-delete-comparison {
+  background-color: transparent;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-delete-comparison:hover {
+  background-color: #fef2f2;
+}
+
+.saved-loans-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.saved-loan-item-pill {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.saved-loan-name {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.saved-loan-rate {
+  color: #2563eb;
+  font-weight: 500;
+}

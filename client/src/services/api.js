@@ -7,12 +7,13 @@ export const getLoans = async (params = {}) => {
   if (params.minRate !== undefined && params.minRate !== '') query.append('minRate', params.minRate);
   if (params.maxRate !== undefined && params.maxRate !== '') query.append('maxRate', params.maxRate);
   if (params.sort) query.append('sort', params.sort);
+  if (params.refresh) query.append('refresh', '1');
 
   const url = `${API_BASE}/loans${query.toString() ? `?${query.toString()}` : ''}`;
   const res = await fetch(url);
   const data = await res.json();
   if (!res.ok) {
-    throw new Error(data.error || 'Failed to fetch loans');
+    throw new Error(data.error || 'Could not verify rates from official bank pages.');
   }
   return data;
 };

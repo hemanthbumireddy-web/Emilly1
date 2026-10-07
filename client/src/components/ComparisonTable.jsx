@@ -1,135 +1,102 @@
-// client/src/components/ComparisonTable.jsx
 import React from 'react';
 import '../styles/ComparisonTable.css';
 
-const formatCurrency = (val) => {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 0,
-  }).format(val);
-};
+const formatCurrency = (value) => new Intl.NumberFormat('en-IN', {
+  style: 'currency',
+  currency: 'INR',
+  maximumFractionDigits: 0,
+}).format(value);
+
+const formatRate = (loan) => loan.rate_kind === 'range' && loan.rate_max != null
+  ? `${Number(loan.interest_rate).toFixed(2)}%–${Number(loan.rate_max).toFixed(2)}% p.a.`
+  : `From ${Number(loan.interest_rate).toFixed(2)}% p.a.`;
 
 export const ComparisonTable = ({ comparisons, onViewSchedule }) => {
   if (!comparisons || comparisons.length === 0) return null;
 
-  const minRate = Math.min(...comparisons.map((c) => Number(c.loan.interest_rate)));
-  const minEmi = Math.min(...comparisons.map((c) => Number(c.summary.monthlyEmi)));
-  const minInterest = Math.min(...comparisons.map((c) => Number(c.summary.totalInterest)));
-  const minFee = Math.min(...comparisons.map((c) => Number(c.summary.processingFee)));
-  const minCost = Math.min(...comparisons.map((c) => Number(c.summary.totalCost)));
-  const minEffectiveCost = Math.min(
-    ...comparisons.map((c) => Number(c.summary.effectiveCostPercent))
-  );
+  const lowestRate = Math.min(...comparisons.map(({ loan }) => Number(loan.interest_rate)));
+  const lowestEmi = Math.min(...comparisons.map(({ summary }) => Number(summary.monthlyEmi)));
+  const lowestInterest = Math.min(...comparisons.map(({ summary }) => Number(summary.totalInterest)));
+  const lowestTotal = Math.min(...comparisons.map(({ summary }) => Number(summary.totalCost)));
 
   return (
-    <div className="comparison-table-card">
-      <div className="comparison-table-scroll">
-        <table className="side-by-side-table">
+    <section className="comparison-section" aria-labelledby="live-comparison-title">
+      <div className="comparison-header">
+        <div>
+          <h2 className="comparison-title" id="live-comparison-title">Indicative loan comparison</h2>
+          <p className="section-subtitle">Estimates use the advertised starting rate or the minimum of a published range. Fees are excluded.</p>
+        </div>
+      </div>
+      <div className="comparison-table-wrapper">
+        <table className="comparison-table">
+          <caption className="sr-only">Indicative loan cost comparison based on official bank rates</caption>
           <thead>
             <tr>
-              <th>Bank</th>
+              <th scope="col">Feature</th>
               {comparisons.map(({ loan }) => (
-                <th key={loan.id}>
-                  <div className="bank-cell-header">
-                    <span className="bank-name-text">{loan.bank_name}</span>
-                    <span className="bank-type-tag">{loan.loan_type} loan</span>
-                    {onViewSchedule && (
-                      <button
-                        type="button"
-                        className="btn-view-schedule"
-                        onClick={() => onViewSchedule(loan)}
-                      >
-                        View schedule
-                      </button>
-                    )}
-                  </div>
+                <th scope="col" key={loan.id}>
+                  <div>{loan.bank_name}</div>
+                  <span className={`loan-type-tag loan-type-${loan.loan_type}`}>
+                    {loan.product_name || `${loan.loan_type} loan`}
+                  </span>
+                  {onViewSchedule && (
+                    <button type="button" className="btn-view-schedule" onClick={() => onViewSchedule(loan)}>
+                      View estimate schedule
+                    </button>
+                  )}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Interest Rate</td>
-              {comparisons.map(({ loan }) => {
-                const isBest = Number(loan.interest_rate) === minRate;
-                return (
-                  <td key={loan.id} className={isBest ? 'highlight-best' : ''}>
-                    {loan.interest_rate}% p.a.
-                    {isBest && <span className="best-badge">Best</span>}
-                  </td>
-                );
-              })}
+              <th scope="row">Official rate</th>
+              {comparisons.map(({ loan }) => (
+                <td key={loan.id} className={Number(loan.interest_rate) === lowestRate ? 'highlight-lowest' : ''}>
+                  {formatRate(loan)}
+                  {Number(loan.interest_rate) === lowestRate && <span className="best-badge">Lowest start</span>}
+                </td>
+              ))}
             </tr>
-
             <tr>
-              <td>Monthly EMI</td>
-              {comparisons.map(({ loan, summary }) => {
-                const isBest = Number(summary.monthlyEmi) === minEmi;
-                return (
-                  <td key={loan.id} className={isBest ? 'highlight-best' : ''}>
-                    {formatCurrency(summary.monthlyEmi)}
-                    {isBest && <span className="best-badge">Lowest</span>}
-                  </td>
-                );
-              })}
+              <th scope="row">Estimated monthly EMI</th>
+              {comparisons.map(({ loan, summary }) => (
+                <td key={loan.id} className={Number(summary.monthlyEmi) === lowestEmi ? 'highlight-lowest' : ''}>
+                  {formatCurrency(summary.monthlyEmi)}
+                  {Number(summary.monthlyEmi) === lowestEmi && <span className="best-badge">Lowest</span>}
+                </td>
+              ))}
             </tr>
-
             <tr>
-              <td>Total Interest</td>
-              {comparisons.map(({ loan, summary }) => {
-                const isBest = Number(summary.totalInterest) === minInterest;
-                return (
-                  <td key={loan.id} className={isBest ? 'highlight-best' : ''}>
-                    {formatCurrency(summary.totalInterest)}
-                    {isBest && <span className="best-badge">Lowest</span>}
-                  </td>
-                );
-              })}
+              <th scope="row">Estimated total interest</th>
+              {comparisons.map(({ loan, summary }) => (
+                <td key={loan.id} className={Number(summary.totalInterest) === lowestInterest ? 'highlight-lowest' : ''}>
+                  {formatCurrency(summary.totalInterest)}
+                </td>
+              ))}
             </tr>
-
-            <tr>
-              <td>Processing Fee</td>
-              {comparisons.map(({ loan, summary }) => {
-                const isBest = Number(summary.processingFee) === minFee;
-                return (
-                  <td key={loan.id} className={isBest ? 'highlight-best' : ''}>
-                    {formatCurrency(summary.processingFee)}
-                    {isBest && <span className="best-badge">Lowest</span>}
-                  </td>
-                );
-              })}
+            <tr className="highlight-row">
+              <th scope="row">Estimated total payable, excluding fees</th>
+              {comparisons.map(({ loan, summary }) => (
+                <td key={loan.id} className={Number(summary.totalCost) === lowestTotal ? 'highlight-lowest' : ''}>
+                  {formatCurrency(summary.totalCost)}
+                  {Number(summary.totalCost) === lowestTotal && <span className="best-badge">Lowest</span>}
+                </td>
+              ))}
             </tr>
-
             <tr>
-              <td>Total Cost</td>
-              {comparisons.map(({ loan, summary }) => {
-                const isBest = Number(summary.totalCost) === minCost;
-                return (
-                  <td key={loan.id} className={isBest ? 'highlight-best' : ''}>
-                    {formatCurrency(summary.totalCost)}
-                    {isBest && <span className="best-badge">Lowest</span>}
-                  </td>
-                );
-              })}
-            </tr>
-
-            <tr>
-              <td>Effective Cost %</td>
-              {comparisons.map(({ loan, summary }) => {
-                const isBest = Number(summary.effectiveCostPercent) === minEffectiveCost;
-                return (
-                  <td key={loan.id} className={isBest ? 'highlight-best' : ''}>
-                    {summary.effectiveCostPercent}%
-                    {isBest && <span className="best-badge">Lowest</span>}
-                  </td>
-                );
-              })}
+              <th scope="row">Rate source</th>
+              {comparisons.map(({ loan }) => (
+                <td key={loan.id}>
+                  <a href={loan.source_url} target="_blank" rel="noopener noreferrer">Official bank page</a>
+                  {loan.source_as_of && <div>Effective / published: {loan.source_as_of}</div>}
+                </td>
+              ))}
             </tr>
           </tbody>
         </table>
       </div>
-    </div>
+    </section>
   );
 };
 

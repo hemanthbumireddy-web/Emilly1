@@ -154,7 +154,11 @@ export const Saved = () => {
                     comp.loans.map((loan) => (
                       <div key={loan.id} className="saved-loan-item-pill">
                         <span className="saved-loan-name">{loan.bank_name}</span>
-                        <span className="saved-loan-rate">{loan.interest_rate}% p.a.</span>
+                        <span className="saved-loan-rate">
+                          {loan.rate_kind === 'range' && loan.rate_max != null
+                            ? `${Number(loan.interest_rate).toFixed(2)}%–${Number(loan.rate_max).toFixed(2)}% p.a.`
+                            : `From ${Number(loan.interest_rate).toFixed(2)}% p.a.`}
+                        </span>
                       </div>
                     ))
                   ) : (

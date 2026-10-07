@@ -42,7 +42,7 @@ export const HomePage: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Load loans
-  const loadLoans = useCallback(async () => {
+  const loadLoans = useCallback(async (forceRefresh = false) => {
     setLoadingLoans(true);
     setErrorMessage(null);
     try {
@@ -50,6 +50,7 @@ export const HomePage: React.FC = () => {
         loan_type: loanType,
         amount,
         tenure_months: tenureMonths,
+        refresh: forceRefresh,
       });
       setLoans(data);
 
@@ -187,9 +188,9 @@ export const HomePage: React.FC = () => {
         {activeTab === 'compare' && (
           <>
             <div className="section-header">
-              <h1 className="section-title">Loan Comparison & EMI Calculator</h1>
+              <h1 className="section-title">Indian Loan Rate Comparison & EMI Calculator</h1>
               <p className="section-subtitle">
-                Compare loans across top banks by interest rates, tenures, processing fees, and calculated monthly payments.
+                Compare published rates fetched from official bank pages. Effective dates are shown per offer; EMI estimates are indicative and final terms depend on lender eligibility.
               </p>
             </div>
 
@@ -219,8 +220,16 @@ export const HomePage: React.FC = () => {
                 Available Loans ({loans.length})
               </h2>
               <p className="section-subtitle">
-                Select 2 or more loans using the "Compare" checkbox to see the detailed side-by-side comparison table above.
+                Select 2 or more offers to compare indicative EMIs. Rates are fetched from official bank pages; eligibility and fees may change your final offer.
               </p>
+              <button
+                type="button"
+                className="tab-button rate-refresh-button"
+                onClick={() => loadLoans(true)}
+                disabled={loadingLoans}
+              >
+                {loadingLoans ? 'Checking bank pages…' : 'Refresh official rates'}
+              </button>
             </div>
 
             {loadingLoans ? (
@@ -229,8 +238,8 @@ export const HomePage: React.FC = () => {
               </div>
             ) : loans.length === 0 ? (
               <div className="empty-state">
-                <h3>No loans found matching your criteria.</h3>
-                <p>Try widening the loan type or adjusting the amount.</p>
+                <h3>No current offers are available for this loan type.</h3>
+                <p>Try another loan type or refresh the official bank pages.</p>
               </div>
             ) : (
               <div className="loan-list-grid">
@@ -273,9 +282,9 @@ export const HomePage: React.FC = () => {
         {activeTab === 'sql' && (
           <>
             <div className="section-header">
-              <h1 className="section-title">Database Schema & RLS Setup</h1>
+              <h1 className="section-title">Saved Comparisons Database Setup</h1>
               <p className="section-subtitle">
-                SQL table definitions, Row Level Security policies, and 12-loan seed script for Supabase.
+                Row Level Security policies for saved comparisons. Live rates are fetched from official bank pages.
               </p>
             </div>
 

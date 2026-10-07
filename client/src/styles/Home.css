@@ -67,6 +67,27 @@
   color: #2563eb;
 }
 
+.btn-refresh-rates {
+  min-height: 40px;
+  padding: 9px 16px;
+  background: #ffffff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-refresh-rates:hover:not(:disabled) {
+  background: #eff6ff;
+}
+
+.btn-refresh-rates:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
 .btn-home-compare {
   background-color: #2563eb;
   color: #ffffff;

@@ -134,7 +134,7 @@ export const Compare = () => {
       <div className="page-header">
         <h1 className="page-title">Side-by-Side Loan Comparison</h1>
         <p className="page-subtitle">
-          Adjust loan amount and tenure below, then run comparison to view detailed tables, cost charts, and AI explanations.
+          Estimates use the lowest published rate and exclude fees. Your lender&apos;s final offer depends on your eligibility, profile, and product terms.
         </p>
       </div>
 

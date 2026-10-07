@@ -1,5 +1,6 @@
 // server/services/savedService.js
 const { createAuthenticatedClient } = require('../config/supabase.js');
+const { getLoansByIds } = require('./loanService.js');
 
 const getSaved = async (token, userId) => {
   const client = createAuthenticatedClient(token);
@@ -20,13 +21,10 @@ const getSaved = async (token, userId) => {
       if (!item.loan_ids || item.loan_ids.length === 0) {
         return { ...item, loans: [] };
       }
-      const { data: loans } = await client
-        .from('loans')
-        .select('*')
-        .in('id', item.loan_ids);
+      const loans = await getLoansByIds(item.loan_ids);
       return {
         ...item,
-        loans: loans || [],
+        loans,
       };
     })
   );

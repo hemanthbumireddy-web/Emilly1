@@ -22,9 +22,7 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
   isSaving,
   canSave,
 }) => {
-  if (selectedLoans.length === 0) {
-    return null;
-  }
+  if (selectedLoans.length === 0) return null;
 
   const calculatedLoans = selectedLoans.map((loan) => ({
     loan,
@@ -32,41 +30,30 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
       amount,
       loan.interest_rate,
       tenureMonths,
-      loan.processing_fee_percent,
-      loan.flat_fee
+      loan.processing_fee_percent ?? 0,
+      loan.flat_fee ?? 0
     ),
   }));
-
-  const lowestEmi = Math.min(...calculatedLoans.map((c) => c.calc.monthlyEmi));
-  const lowestRate = Math.min(...calculatedLoans.map((c) => c.loan.interest_rate));
-  const lowestTotalPayable = Math.min(...calculatedLoans.map((c) => c.calc.totalPayable));
+  const lowestEmi = Math.min(...calculatedLoans.map(({ calc }) => calc.monthlyEmi));
+  const lowestRate = Math.min(...calculatedLoans.map(({ loan }) => loan.interest_rate));
+  const lowestTotalPayable = Math.min(...calculatedLoans.map(({ calc }) => calc.totalPayable));
 
   return (
-    <section className="comparison-section">
+    <section className="comparison-section" aria-labelledby="comparison-title">
       <div className="comparison-header">
         <div>
-          <h2 className="comparison-title">
+          <h2 className="comparison-title" id="comparison-title">
             Comparing {selectedLoans.length} Loan{selectedLoans.length > 1 ? 's' : ''}
           </h2>
           <span className="section-subtitle">
-            Based on ₹{amount.toLocaleString()} for {tenureMonths} Months ({Math.round((tenureMonths / 12) * 10) / 10} Years)
+            Indicative estimates for ₹{amount.toLocaleString('en-IN')} over {tenureMonths} months, using each bank&apos;s advertised starting rate. Fees excluded.
           </span>
         </div>
-
         <div className="comparison-actions">
-          <button
-            type="button"
-            className="btn-save-comparison"
-            onClick={onSave}
-            disabled={isSaving}
-          >
+          <button type="button" className="btn-save-comparison" onClick={onSave} disabled={isSaving}>
             {isSaving ? 'Saving...' : canSave ? 'Save Comparison' : 'Sign in to Save'}
           </button>
-          <button
-            type="button"
-            className="btn-clear-comparison"
-            onClick={onClear}
-          >
+          <button type="button" className="btn-clear-comparison" onClick={onClear}>
             Clear Selection
           </button>
         </div>
@@ -74,14 +61,15 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
 
       <div className="comparison-table-wrapper">
         <table className="comparison-table">
+          <caption className="sr-only">Indicative loan cost comparison based on advertised starting rates</caption>
           <thead>
             <tr>
-              <th>Feature / Metric</th>
+              <th scope="col">Feature / Metric</th>
               {calculatedLoans.map(({ loan }) => (
-                <th key={loan.id}>
+                <th scope="col" key={loan.id}>
                   <div>{loan.bank_name}</div>
                   <span className={`loan-type-tag loan-type-${loan.loan_type}`}>
-                    {loan.loan_type}
+                    {loan.product_name}
                   </span>
                 </th>
               ))}
@@ -89,86 +77,46 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({
           </thead>
           <tbody>
             <tr className="highlight-row">
-              <td>Monthly EMI</td>
+              <th scope="row">Estimated monthly EMI</th>
               {calculatedLoans.map(({ loan, calc }) => (
-                <td
-                  key={loan.id}
-                  className={calc.monthlyEmi === lowestEmi ? 'highlight-lowest' : ''}
-                >
-                  {formatCurrency(calc.monthlyEmi)}
-                  {calc.monthlyEmi === lowestEmi && ' (Lowest)'}
+                <td key={loan.id} className={calc.monthlyEmi === lowestEmi ? 'highlight-lowest' : ''}>
+                  {formatCurrency(calc.monthlyEmi)}{calc.monthlyEmi === lowestEmi && ' (Lowest)'}
                 </td>
               ))}
             </tr>
-
             <tr>
-              <td>Interest Rate</td>
+              <th scope="row">Official rate</th>
               {calculatedLoans.map(({ loan }) => (
-                <td
-                  key={loan.id}
-                  className={loan.interest_rate === lowestRate ? 'highlight-lowest' : ''}
-                >
-                  {loan.interest_rate}% p.a.
-                  {loan.interest_rate === lowestRate && ' (Best)'}
+                <td key={loan.id} className={loan.interest_rate === lowestRate ? 'highlight-lowest' : ''}>
+                  {loan.rate_kind === 'range' && loan.rate_max !== null
+                    ? `${loan.interest_rate.toFixed(2)}%–${loan.rate_max.toFixed(2)}% p.a.`
+                    : `From ${loan.interest_rate.toFixed(2)}% p.a.`}
+                  {loan.interest_rate === lowestRate && ' (Lowest starting rate)'}
                 </td>
               ))}
             </tr>
-
             <tr>
-              <td>Total Interest</td>
+              <th scope="row">Estimated total interest</th>
               {calculatedLoans.map(({ loan, calc }) => (
                 <td key={loan.id}>{formatCurrency(calc.totalInterest)}</td>
               ))}
             </tr>
-
-            <tr>
-              <td>Processing Fee</td>
-              {calculatedLoans.map(({ loan, calc }) => (
-                <td key={loan.id}>
-                  {formatCurrency(calc.processingFee)} ({loan.processing_fee_percent}%
-                  {loan.flat_fee > 0 ? ` + ₹${loan.flat_fee}` : ''})
-                </td>
-              ))}
-            </tr>
-
-            <tr>
-              <td>Prepayment Penalty</td>
-              {calculatedLoans.map(({ loan }) => (
-                <td key={loan.id}>
-                  {loan.prepayment_penalty_percent > 0
-                    ? `${loan.prepayment_penalty_percent}%`
-                    : 'Nil (0%)'}
-                </td>
-              ))}
-            </tr>
-
             <tr className="highlight-row">
-              <td>Total Amount Payable</td>
+              <th scope="row">Estimated total payable, excluding fees</th>
               {calculatedLoans.map(({ loan, calc }) => (
-                <td
-                  key={loan.id}
-                  className={calc.totalPayable === lowestTotalPayable ? 'highlight-lowest' : ''}
-                >
-                  {formatCurrency(calc.totalPayable)}
-                  {calc.totalPayable === lowestTotalPayable && ' (Lowest Overall)'}
+                <td key={loan.id} className={calc.totalPayable === lowestTotalPayable ? 'highlight-lowest' : ''}>
+                  {formatCurrency(calc.totalPayable)}{calc.totalPayable === lowestTotalPayable && ' (Lowest)'}
                 </td>
               ))}
             </tr>
-
             <tr>
-              <td>Loan Amount Limits</td>
+              <th scope="row">Rate source</th>
               {calculatedLoans.map(({ loan }) => (
                 <td key={loan.id}>
-                  {formatCurrency(loan.min_amount)} to {formatCurrency(loan.max_amount)}
-                </td>
-              ))}
-            </tr>
-
-            <tr>
-              <td>Allowed Tenure</td>
-              {calculatedLoans.map(({ loan }) => (
-                <td key={loan.id}>
-                  {loan.min_tenure_months} to {loan.max_tenure_months} months
+                  <a href={loan.source_url} target="_blank" rel="noopener noreferrer">
+                    Official bank page
+                  </a>
+                  {loan.source_as_of && <div>Effective / published: {loan.source_as_of}</div>}
                 </td>
               ))}
             </tr>

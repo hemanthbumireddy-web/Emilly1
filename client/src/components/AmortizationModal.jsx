@@ -50,7 +50,7 @@ export const AmortizationModal = ({
               Amortization Schedule — {loan.bank_name}
             </h3>
             <p className="amort-header-subtitle">
-              ₹{totalPrincipal.toLocaleString()} at {loan.interest_rate}% for {tenureMonths} months
+              ₹{totalPrincipal.toLocaleString('en-IN')} at the advertised minimum rate of {Number(loan.interest_rate).toFixed(2)}% for {tenureMonths} months. Fees excluded; actual rate may differ.
             </p>
           </div>
           <button

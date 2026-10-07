@@ -31,8 +31,8 @@ export const CostChart = ({ comparisons }) => {
     <div className="cost-chart-card">
       <div className="cost-chart-header">
         <h3 className="cost-chart-title">Total Cost Comparison</h3>
-        <p className="cost-chart-subtitle">
-          Total amount payable including principal, total interest, and all processing fees
+          <p className="cost-chart-subtitle">
+          Estimated total payable at the lowest published rate; fees and lender-specific charges are excluded
         </p>
       </div>
 

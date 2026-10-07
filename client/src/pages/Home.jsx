@@ -22,7 +22,7 @@ export const Home = () => {
 
   const navigate = useNavigate();
 
-  const fetchLoansList = useCallback(async () => {
+  const fetchLoansList = useCallback(async (forceRefresh = false) => {
     setLoading(true);
     setError(null);
     try {
@@ -31,6 +31,7 @@ export const Home = () => {
         minRate,
         maxRate,
         sort,
+        refresh: forceRefresh,
       });
       setLoans(data);
     } catch (err) {
@@ -71,9 +72,9 @@ export const Home = () => {
   return (
     <div className="page-wrapper">
       <div className="page-header">
-        <h1 className="page-title">Loan Comparison & Search</h1>
+        <h1 className="page-title">Indian Loan Rate Comparison</h1>
         <p className="page-subtitle">
-          Filter and sort loans by interest rates and fees. Select 2 to 4 loans to compare their EMI and total cost.
+          Compare rates fetched directly from official bank pages. Each offer shows its published or effective date; starting rates are indicative and your final terms depend on lender eligibility.
         </p>
       </div>
 
@@ -120,13 +121,12 @@ export const Home = () => {
               <option value="home">Home Loan</option>
               <option value="personal">Personal Loan</option>
               <option value="car">Car Loan</option>
-              <option value="education">Education Loan</option>
             </select>
           </div>
 
           <div className="home-filter-field">
             <label className="home-filter-label" htmlFor="filter-min-rate">
-              Min Rate (%)
+              Min Starting Rate (%)
             </label>
             <input
               id="filter-min-rate"
@@ -142,7 +142,7 @@ export const Home = () => {
 
           <div className="home-filter-field">
             <label className="home-filter-label" htmlFor="filter-max-rate">
-              Max Rate (%)
+              Max Starting Rate (%)
             </label>
             <input
               id="filter-max-rate"
@@ -166,8 +166,7 @@ export const Home = () => {
               value={sort}
               onChange={(e) => setSort(e.target.value)}
             >
-              <option value="rate_asc">Lowest Rate</option>
-              <option value="fee_asc">Lowest Fees</option>
+              <option value="rate_asc">Lowest Starting Rate</option>
             </select>
           </div>
         </div>
@@ -178,6 +177,15 @@ export const Home = () => {
         <div className="home-selection-info">
           Selected: <span className="home-selection-count">{selectedIds.length}</span> of 4 loans
         </div>
+
+        <button
+          type="button"
+          className="btn-refresh-rates"
+          onClick={() => fetchLoansList(true)}
+          disabled={loading}
+        >
+          {loading ? 'Checking bank pages…' : 'Refresh official rates'}
+        </button>
 
         <button
           type="button"
@@ -194,12 +202,12 @@ export const Home = () => {
       {/* Loans Grid / Loading / Empty */}
       {loading ? (
         <div className="empty-state-card">
-          <p className="empty-state-text">Loading loans...</p>
+          <p className="empty-state-text">Checking official bank rate pages…</p>
         </div>
       ) : loans.length === 0 ? (
         <div className="empty-state-card">
-          <h2 className="empty-state-title">No loans match your criteria</h2>
-          <p className="empty-state-text">Try adjusting the loan type or interest rate filters.</p>
+          <h2 className="empty-state-title">No verified offers match these filters</h2>
+          <p className="empty-state-text">Try another loan type or widen the rate range.</p>
         </div>
       ) : (
         <div className="home-loans-grid">

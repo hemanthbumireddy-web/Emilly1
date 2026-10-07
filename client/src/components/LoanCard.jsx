@@ -1,74 +1,60 @@
-// client/src/components/LoanCard.jsx
 import React from 'react';
 import '../styles/LoanCard.css';
 
-const formatCurrency = (val) => {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 0,
-  }).format(val);
-};
+const formatCheckedAt = (value) => new Intl.DateTimeFormat('en-IN', {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+  timeZone: 'Asia/Kolkata',
+}).format(new Date(value));
 
 export const LoanCard = ({ loan, isSelected, onToggle }) => {
+  const rateLabel = loan.rate_kind === 'range' && loan.rate_max != null
+    ? `${Number(loan.interest_rate).toFixed(2)}%–${Number(loan.rate_max).toFixed(2)}% p.a.`
+    : `From ${Number(loan.interest_rate).toFixed(2)}% p.a.`;
+
   return (
-    <div className={`loan-card-item ${isSelected ? 'selected' : ''}`}>
-      <div>
-        <div className="loan-card-top">
-          <div className="loan-card-bank-info">
-            <h3 className="loan-card-bank-name">{loan.bank_name}</h3>
-            <span className={`loan-card-type-tag loan-card-type-${loan.loan_type}`}>
-              {loan.loan_type} loan
-            </span>
-          </div>
-
-          <label className="loan-card-checkbox-label">
-            <input
-              type="checkbox"
-              className="loan-card-checkbox"
-              checked={isSelected}
-              onChange={() => onToggle(loan.id)}
-            />
-            Select
-          </label>
+    <article className={`loan-card ${isSelected ? 'selected' : ''}`}>
+      <div className="loan-card-top">
+        <div>
+          <h2 className="loan-bank-name">{loan.bank_name}</h2>
+          <p className="loan-product-name">{loan.product_name || `${loan.loan_type} loan`}</p>
+          <span className={`loan-type-tag loan-type-${loan.loan_type}`}>
+            {loan.loan_type} loan
+          </span>
         </div>
+        <label className="loan-card-select-label">
+          <input
+            type="checkbox"
+            className="loan-card-checkbox"
+            checked={isSelected}
+            onChange={() => onToggle(loan.id)}
+          />
+          Compare
+        </label>
+      </div>
 
-        <div className="loan-card-rate-box">
-          <span className="loan-card-rate-label">Interest Rate</span>
-          <span className="loan-card-rate-val">{loan.interest_rate}% p.a.</span>
+      <div className="loan-metric-primary">
+        <div>
+          <div className="metric-label">Published interest rate</div>
+          <div className="metric-rate-large">{rateLabel}</div>
         </div>
-
-        <div className="loan-card-details-grid">
-          <div className="loan-card-detail-item">
-            <span className="loan-card-detail-key">Tenure Range</span>
-            <span className="loan-card-detail-value">
-              {loan.min_tenure_months} - {loan.max_tenure_months} mo
-            </span>
-          </div>
-
-          <div className="loan-card-detail-item">
-            <span className="loan-card-detail-key">Amount Range</span>
-            <span className="loan-card-detail-value">
-              {formatCurrency(loan.min_amount)} - {formatCurrency(loan.max_amount)}
-            </span>
-          </div>
-
-          <div className="loan-card-detail-item">
-            <span className="loan-card-detail-key">Processing Fee</span>
-            <span className="loan-card-detail-value">
-              {loan.processing_fee_percent}%
-            </span>
-          </div>
-
-          <div className="loan-card-detail-item">
-            <span className="loan-card-detail-key">Flat Fee</span>
-            <span className="loan-card-detail-value">
-              {loan.flat_fee > 0 ? formatCurrency(loan.flat_fee) : 'Nil'}
-            </span>
-          </div>
+        <div className="metric-rate-group">
+          <div className="metric-label">Page checked</div>
+          <div className="metric-value-large">{formatCheckedAt(loan.checked_at)} IST</div>
         </div>
       </div>
-    </div>
+
+      <p className="loan-rate-caveat">
+        Advertised rates are indicative and depend on eligibility and product terms. Fees are not included.
+      </p>
+
+      <div className="loan-source-footer">
+        {loan.source_as_of && <span>Rate effective / page date: {loan.source_as_of}</span>}
+        <a href={loan.source_url} target="_blank" rel="noopener noreferrer">
+          View official source
+        </a>
+      </div>
+    </article>
   );
 };
 

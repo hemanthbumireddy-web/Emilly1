@@ -3,8 +3,8 @@ const loanService = require('../services/loanService.js');
 
 const listLoans = async (req, res) => {
   try {
-    const { type, minRate, maxRate, sort } = req.query;
-    const loans = await loanService.getLoans({ type, minRate, maxRate, sort });
+    const { type, minRate, maxRate, sort, refresh } = req.query;
+    const loans = await loanService.getLoans({ type, minRate, maxRate, sort, refresh });
     return res.status(200).json(loans);
   } catch (err) {
     const status = err.statusCode || 500;

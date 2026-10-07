@@ -11,6 +11,12 @@ interface LoanCardProps {
   onToggleSelect: (loanId: string) => void;
 }
 
+const formatCheckedAt = (value: string) => new Intl.DateTimeFormat('en-IN', {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+  timeZone: 'Asia/Kolkata',
+}).format(new Date(value));
+
 export const LoanCard: React.FC<LoanCardProps> = ({
   loan,
   amount,
@@ -22,18 +28,19 @@ export const LoanCard: React.FC<LoanCardProps> = ({
     amount,
     loan.interest_rate,
     tenureMonths,
-    loan.processing_fee_percent,
-    loan.flat_fee
+    loan.processing_fee_percent ?? 0,
+    loan.flat_fee ?? 0
   );
-
-  const isAmountOutOfRange = amount < loan.min_amount || amount > loan.max_amount;
-  const isTenureOutOfRange = tenureMonths < loan.min_tenure_months || tenureMonths > loan.max_tenure_months;
+  const rateLabel = loan.rate_kind === 'range' && loan.rate_max !== null
+    ? `${loan.interest_rate.toFixed(2)}%–${loan.rate_max.toFixed(2)}% p.a.`
+    : `From ${loan.interest_rate.toFixed(2)}% p.a.`;
 
   return (
-    <div className={`loan-card ${isSelected ? 'selected' : ''}`}>
+    <article className={`loan-card ${isSelected ? 'selected' : ''}`}>
       <div className="loan-card-top">
         <div>
           <h3 className="loan-bank-name">{loan.bank_name}</h3>
+          <p className="loan-product-name">{loan.product_name}</p>
           <span className={`loan-type-tag loan-type-${loan.loan_type}`}>
             {loan.loan_type} loan
           </span>
@@ -51,55 +58,37 @@ export const LoanCard: React.FC<LoanCardProps> = ({
 
       <div className="loan-metric-primary">
         <div>
-          <div className="metric-label">Estimated EMI</div>
-          <div className="metric-value-large">
-            {formatCurrency(calculation.monthlyEmi)}
-          </div>
+          <div className="metric-label">Estimated EMI at starting rate</div>
+          <div className="metric-value-large">{formatCurrency(calculation.monthlyEmi)}</div>
         </div>
         <div className="metric-rate-group">
-          <div className="metric-label">Interest Rate</div>
-          <div className="metric-rate-large">{loan.interest_rate}% p.a.</div>
+          <div className="metric-label">Official rate</div>
+          <div className="metric-rate-large">{rateLabel}</div>
         </div>
       </div>
+
+      <p className="loan-rate-caveat">
+        Indicative only. Your approved rate depends on eligibility, credit profile, and loan terms. Fees are not included.
+      </p>
 
       <div className="loan-details-grid">
         <div className="detail-row">
-          <span className="detail-key">Total Interest</span>
+          <span className="detail-key">Estimated interest</span>
           <span className="detail-val">{formatCurrency(calculation.totalInterest)}</span>
         </div>
         <div className="detail-row">
-          <span className="detail-key">Processing Fee</span>
-          <span className="detail-val">
-            {loan.processing_fee_percent}% {loan.flat_fee > 0 ? `+ ₹${loan.flat_fee}` : ''}
-          </span>
-        </div>
-        <div className="detail-row">
-          <span className="detail-key">Total Cost (Payable)</span>
+          <span className="detail-key">Total payable, excluding fees</span>
           <span className="detail-val">{formatCurrency(calculation.totalPayable)}</span>
         </div>
-        <div className="detail-row">
-          <span className="detail-key">Prepayment Penalty</span>
-          <span className="detail-val">
-            {loan.prepayment_penalty_percent > 0 ? `${loan.prepayment_penalty_percent}%` : 'Nil'}
-          </span>
-        </div>
       </div>
 
-      <div className="loan-card-footer">
-        <span>Tenure: {loan.min_tenure_months} - {loan.max_tenure_months} mo</span>
-        <span>Limits: {formatCurrency(loan.min_amount)} - {formatCurrency(loan.max_amount)}</span>
+      <div className="loan-source-footer">
+        <span>Checked {formatCheckedAt(loan.checked_at)} IST</span>
+        {loan.source_as_of && <span>Official rate date: {loan.source_as_of}</span>}
+        <a href={loan.source_url} target="_blank" rel="noopener noreferrer">
+          View official source
+        </a>
       </div>
-
-      {isAmountOutOfRange && (
-        <div className="error-banner range-warning">
-          Selected amount ₹{amount.toLocaleString()} is outside this loan's limit.
-        </div>
-      )}
-      {isTenureOutOfRange && (
-        <div className="error-banner range-warning">
-          Selected tenure {tenureMonths} mo is outside this loan's range.
-        </div>
-      )}
-    </div>
+    </article>
   );
 };
